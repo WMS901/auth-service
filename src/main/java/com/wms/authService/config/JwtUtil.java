@@ -1,7 +1,7 @@
 package com.wms.authService.config;
 
 import com.wms.authService.entity.RefreshToken;
-import com.wms.authService.repository.RefreshTokenRepository;
+import com.wms.authService.repository.AuthRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -15,7 +15,7 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class JwtUtil {
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final AuthRepository authRepository;
     private Key key;
 
     @Value("${jwt.secret}")
@@ -50,13 +50,13 @@ public class JwtUtil {
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
-        refreshTokenRepository.save(new RefreshToken(email, refreshToken));
+        authRepository.save(new RefreshToken(email, refreshToken));
 
         return refreshToken;
     }
 
     public boolean validateRefreshToken(String email, String refreshToken) {
-        Optional<RefreshToken> storedToken = refreshTokenRepository.findByEmail(email);
+        Optional<RefreshToken> storedToken = authRepository.findByEmail(email);
         return storedToken.map(token -> token.getRefreshToken().equals(refreshToken)).orElse(false);
     }
 

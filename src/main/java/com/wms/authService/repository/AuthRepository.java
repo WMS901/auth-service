@@ -1,9 +1,10 @@
 package com.wms.authService.repository;
 
-import com.wms.authService.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.wms.authService.entity.RefreshToken;
+import org.springframework.data.repository.CrudRepository;
+
 import java.util.Optional;
 
-public interface AuthRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+public interface AuthRepository extends CrudRepository<RefreshToken, String> {
+    Optional<RefreshToken> findByEmail(String email);
 }

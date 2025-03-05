@@ -3,7 +3,7 @@ package com.wms.authService.service.impl;
 import com.wms.authService.dto.SignupRequestDto;
 import com.wms.authService.dto.UserResponseDto;
 import com.wms.authService.entity.User;
-import com.wms.authService.repository.AuthRepository;
+import com.wms.authService.repository.UserRepository;
 import com.wms.authService.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final AuthRepository userRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
