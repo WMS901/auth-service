@@ -1,4 +1,4 @@
-package com.wms.authService.contorller;
+package com.wms.authService.controller;
 
 import com.wms.authService.dto.SignupRequestDto;
 import com.wms.authService.dto.UserResponseDto;
