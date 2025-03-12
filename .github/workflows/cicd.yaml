@@ -1,0 +1,76 @@
+name: Push CI & CD - Auth Service
+
+on:
+  push:
+    branches:
+      - dev
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for Gradle
+        run: chmod +x gradlew
+
+      - name: Full Build & Test
+        run: |
+          ./gradlew build
+          ./gradlew test
+
+      - name: Determine Docker Image Tag
+        id: docker_tag
+        run: |
+          if [[ $GITHUB_REF == refs/heads/dev ]]; then
+            echo "TAG=dev" >> $GITHUB_ENV
+          elif [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "TAG=latest" >> $GITHUB_ENV
+          fi
+
+      - name: Build and Push Docker Image (Only for dev & tags)
+        if: github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/v')
+        run: |
+          echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/user-service:${{ env.TAG }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/user-service:${{ env.TAG }}
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/user-service:${{ env.TAG }} ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/user-service:latest
+          fi
+
+  update-helm:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - name: Checkout Helm Chart Repository
+        uses: actions/checkout@v3
+        with:
+          repository: WMS901/wms-helm-charts
+          token: ${{ secrets.TOKEN }}
+
+      - name: Set Helm Image Tag
+        run: |
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Update Helm values.yaml for ArgoCD Deployment
+        run: |
+          cd service/user-service
+          sed -i 's/tag: .*/tag: "${{ env.TAG }}"/g' values.yaml
+          git config --global user.email ${{ secrets.USER_EMAIL }}
+          git config --global user.name ${{ secrets.USER_NAME }}
+          git add values.yaml
+          git commit -m "chore: update auth-service image tag to ${{ env.TAG }}"
+          git push origin main
