@@ -3,33 +3,34 @@ package com.wms.authService.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.redis.host}")
-    private String redisHost;
-
-    @Value("${spring.redis.port}")
-    private int redisPort;
+    @Value("${spring.redis.cluster.nodes}") // ✅ 클러스터 노드 리스트
+    private String redisClusterNodes;
 
     @Value("${spring.redis.password}")
     private String redisPassword;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        System.out.println("🔍 Redis 연결 확인: " + redisHost + ":" + redisPort);
+        List<String> nodes = Arrays.asList(redisClusterNodes.split(",")); // 노드 리스트 변환
+        RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(nodes);
+        clusterConfig.setPassword(redisPassword);
+
+        System.out.println("🔍 Redis 클러스터 연결 확인: " + redisClusterNodes);
         System.out.println("🔑 Redis 비밀번호 확인: " + (redisPassword.isEmpty() ? "비밀번호 없음" : "설정됨"));
 
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
-        config.setPassword(redisPassword);  // ✅ 비밀번호 설정
-
-        return new LettuceConnectionFactory(config);
+        return new LettuceConnectionFactory(clusterConfig);
     }
 
     @Bean

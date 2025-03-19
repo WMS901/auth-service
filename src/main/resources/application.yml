@@ -13,7 +13,7 @@ spring:
 #    host: ${REDIS_HOST}
     port: ${REDIS_PORT}
     cluster:
-      nodes: ${REDIS_NODES}
+      nodes: ${REDIS_CLUSTER_NODES}
     password: ${REDIS_PASSWORD}
   jpa:
     hibernate:
