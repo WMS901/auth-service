@@ -7,12 +7,14 @@ import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Configuration
+@EnableRedisRepositories  // ✅ Redis Repository 사용 가능하게 설정
 public class RedisConfig {
 
     @Value("${spring.redis.cluster.nodes}") // ✅ 클러스터 노드 리스트
