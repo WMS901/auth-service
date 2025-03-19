@@ -10,8 +10,16 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: ${DB_DRIVER}
   redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
+#    host: ${REDIS_HOST}
+#    port: ${REDIS_PORT}
+    cluster:
+      nodes:
+        - ${REDIS_0}
+        - ${REDIS_1}
+        - ${REDIS_2}
+        - ${REDIS_3}
+        - ${REDIS_4}
+        - ${REDIS_5}
     password: ${REDIS_PASSWORD}
   jpa:
     hibernate:
