@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.security.SecurityException;
 import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Optional;
 
@@ -36,6 +37,7 @@ public class JwtUtil {
     public String createAccessToken(String email) {
         return Jwts.builder()
                 .setSubject(email)
+                .setIssuer("wms-auth-service")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -68,6 +70,10 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
+    }
+
+    public String getPublicKey() {
+        return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
     public String validateTokenAndGetEmail(String token) {
