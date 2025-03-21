@@ -35,4 +35,9 @@ public class AuthController {
             return ResponseEntity.ok("✅ 유효한 토큰입니다. 사용자: " + email);
         }
     }
+
+    @GetMapping("/public-key")
+    public ResponseEntity<String> getPublicKey() {
+        return ResponseEntity.ok(jwtUtil.getPublicKey());
+    }
 }

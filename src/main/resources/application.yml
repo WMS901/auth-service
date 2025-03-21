@@ -25,8 +25,8 @@ spring:
 
 jwt:
   secret: "your-super-secret-key-that-is-very-long"
-  access-token-expiration: 30000  # 30초
-  refresh-token-expiration: 1800000  # 30분
+  access-token-expiration: 1800000  # 30분
+  refresh-token-expiration: 3600000  # 30분
 
 logging:
   level:
