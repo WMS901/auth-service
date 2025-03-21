@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.security.SecurityException;
 import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
@@ -69,22 +70,26 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public boolean validateToken(String token) {
+    public String validateTokenAndGetEmail(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject(); // ✅ 이메일 반환
         } catch (ExpiredJwtException e) {
             System.out.println("토큰이 만료되었습니다.");
-            return false;
+            return "EXPIRED";  // ✅ 만료된 토큰
         } catch (MalformedJwtException e) {
             System.out.println("손상된 토큰입니다.");
-            return false;
-        } catch (SignatureException e) {
+            return "INVALID";
+        } catch (SecurityException e) {
             System.out.println("서명이 잘못되었습니다.");
-            return false;
+            return "INVALID";
         } catch (Exception e) {
             System.out.println("토큰 검증 실패");
-            return false;
+            return "INVALID";
         }
     }
 }
