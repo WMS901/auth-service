@@ -10,7 +10,6 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: ${DB_DRIVER}
   redis:
-#    host: ${REDIS_HOST}
     port: ${REDIS_PORT}
     cluster:
       nodes: ${REDIS_CLUSTER_NODES}
@@ -33,3 +32,12 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.security: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
