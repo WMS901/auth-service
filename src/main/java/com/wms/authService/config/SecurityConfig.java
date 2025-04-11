@@ -45,6 +45,7 @@ public class SecurityConfig {
 
         config.setAllowedOrigins(List.of(
                 "https://d35bvw568gyud1.cloudfront.net",
+                "https://web.solcloud.store",
                 "https://solcloud.store"
         ));
 
